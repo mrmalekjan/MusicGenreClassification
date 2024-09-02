@@ -28,3 +28,18 @@ def reflect_pad(signal, pad_width):
     padded_signal = tf.concat((left_pad, signal, right_pad),0)
     #padded_signal = np.concatenate((left_pad, signal, right_pad))
     return padded_signal
+
+def audio_nomalizer(audio):
+  audio_max = np.max(audio)
+  audio_min = np.min(audio)
+  audio = (audio - audio_min)/(audio_max - audio_min)
+  return audio, audio_min, audio_max
+
+def audio_spectrogram_extractor(audio, n_fft=2048, hop_length=1024, expand_dims=False, normalize=False):
+  audio_spectrogram = librosa.stft(audio, n_fft=n_fft, hop_length=hop_length)
+  audio_spectrogram = librosa.amplitude_to_db(np.abs(audio_spectrogram), ref=np.max)
+  if expand_dims == True:
+    audio_spectrogram = np.expand_dims(audio_spectrogram, axis=2)
+  if normalize == True:
+    audio_spectrogram = (audio_spectrogram - np.min(audio_spectrogram)) / (np.max(audio_spectrogram) - np.min(audio_spectrogram))
+  return audio_spectrogram
